@@ -1,5 +1,5 @@
 require 'base64'
-require 'open-uri'
+require 'cgi'
 require 'sinatra'
 require 'zlib'
 
@@ -12,15 +12,19 @@ def base64_encode(s)
 end
 
 def urlencode(s)
-  URI::encode(s)
+  CGI::escape(s)
+end
+
+def singleline(s)
+  s.gsub("\n", ' ')
 end
 
 def encode(s)
-  urlencode(base64_encode(gzdeflate(s)))
+  urlencode(singleline(base64_encode(gzdeflate(s))).strip.gsub(' ', ''))
 end
 
 def remove_intermediate_speces(s)
-  s.strip.gsub("\n", ' ').gsub(/>\s+/, '>').gsub(/\s+</, '<').gsub(/\s+/, ' ')
+  singleline(s.strip).gsub(/>\s+/, '>').gsub(/\s+</, '<').gsub(/\s+/, ' ')
 end
 
 # def gzinflate(s)
